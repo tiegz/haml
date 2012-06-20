@@ -412,15 +412,16 @@ END
         attributes = data_attributes.merge(attributes)
       end
 
-      result = attributes.collect do |attr, value|
+      result = []
+      attributes.each do |attr, value|
         next if value.nil?
 
         value = filter_and_join(value, ' ') if attr == 'class'
         value = filter_and_join(value, '_') if attr == 'id'
 
         if value == true
-          next " #{attr}" if is_html
-          next " #{attr}=#{attr_wrapper}#{attr}#{attr_wrapper}"
+          result << (is_html ? " #{attr}" : " #{attr}=#{attr_wrapper}#{attr}#{attr_wrapper}")
+          next
         elsif value == false
           next
         end
@@ -448,7 +449,7 @@ END
         else
           this_attr_wrapper = attr_wrapper
         end
-        " #{attr}=#{this_attr_wrapper}#{value}#{this_attr_wrapper}"
+        result << " #{attr}=#{this_attr_wrapper}#{value}#{this_attr_wrapper}"
       end
       result.compact.sort.join
     end
